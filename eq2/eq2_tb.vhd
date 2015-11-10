@@ -23,12 +23,12 @@ begin
 		variable gooda, goodb : boolean;
 		variable linenumber : integer := 1;
 	begin
-		if linenumber = 1 then
-			write(printline, "#a b aeqb");
-			writeline(outfile, printline);
-		end if;
 		if endfile(infile) then
 			wait; 
+		end if;
+		if linenumber = 1 then
+			write(outline, "#a b aeqb");
+			writeline(outfile, outline);
 		end if;
 		readline(infile, inline);
 		if inline(inline'low) /= '#' then
@@ -45,7 +45,7 @@ begin
 				write(outline, test_out);
 				writeline(outfile, outline);
 			else
-				write(printline, "something wrong at line "&integer'image(linenumber));
+				write(printline, "something wrong at line "&integer'image(linenumber)&" at time "&time'image(now));
 				writeline(output, printline);
 				wait; 
 			end if;
