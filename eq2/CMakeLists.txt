@@ -86,6 +86,6 @@ run all;")
 add_custom_target(
 	sim
 	COMMAND fuse -intstyle ise -incremental -lib secureip -o ${PROJECT_NAME}_tb_isim.exe -prj ${PROJECT_NAME}_tb.prj work.${PROJECT_NAME}_tb
-	COMMAND ./${PROJECT_NAME}_tb_isim.exe -intstyle ise -gui -tclbatch isim.cmd
+	COMMAND ${CMAKE_BINARY_DIR}/${PROJECT_NAME}_tb_isim.exe -intstyle ise -gui -tclbatch isim.cmd
 	COMMAND ${CMAKE_COMMAND} -E copy out.txt ${CMAKE_SOURCE_DIR}/out.txt
 )
