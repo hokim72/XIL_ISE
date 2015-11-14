@@ -1,0 +1,4 @@
+# time timeunit q
+0 ns 0
+110 ns 1
+130 ns 0
