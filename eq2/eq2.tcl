@@ -121,7 +121,7 @@ proc rebuild_project {} {
    create_libraries
    puts "$myScript: project rebuild completed."
 
-   run_process
+   #run_process
 
 }
 

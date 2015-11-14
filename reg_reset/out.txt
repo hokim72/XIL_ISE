@@ -1,0 +1,6 @@
+# time timeunit q(hex)
+0 ns 00
+50 ns 03
+70 ns 00
+110 ns 7F
+130 ns 00

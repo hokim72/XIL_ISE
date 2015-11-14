@@ -6,13 +6,16 @@ file(GLOB SRCS *.vhd)
 set(UCF ${PROJECT_NAME}.ucf)
 file(COPY ${SRCS} ${UCF} in.txt  DESTINATION ${CMAKE_BINARY_DIR})
 
-add_custom_command(
+execute_process(
 	COMMAND xtclsh ${CMAKE_SOURCE_DIR}/${PROJECT_NAME}.tcl rebuild_project
+)
+
+add_custom_command(  
+	COMMAND xtclsh ${CMAKE_SOURCE_DIR}/${PROJECT_NAME}.tcl run_process
 	OUTPUT ${PROJECT_NAME}.bit
 )
 
-add_custom_target(build ALL
-	COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_NAME}.bit ${CMAKE_SOURCE_DIR}/${PROJECT_NAME}.bit
+add_custom_target(generate-bit ALL
 	DEPENDS ${PROJECT_NAME}.bit
 )
 
@@ -27,7 +30,7 @@ exit")
 
 add_custom_target(download-bit
 	COMMAND impact -batch download.cmd
-	DEPENDS ${PROJECT_NAME}.bit
+	DEPENDS generate-bit
 )
 set(SIZE 16384)
 file(WRITE ${CMAKE_BINARY_DIR}/generate.cmd
@@ -62,11 +65,12 @@ Program -p 1 -dataWidth 1 -spionly -e -loadfpga
 quit")
 
 add_custom_target(
-	generate-mcs
+	generate-mcs ALL
 	COMMAND impact -batch generate.cmd
-	COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_NAME}.mcs ${CMAKE_SOURCE_DIR}/${PROJECT_NAME}.mcs
-	DEPENDS ${PROJECT_NAME}.bit
+	DEPENDS generate-bit
 )
+
+install(FILES ${CMAKE_BINARY_DIR}/${PROJECT_NAME}.bit ${CMAKE_BINARY_DIR}/${PROJECT_NAME}.mcs DESTINATION ${CMAKE_SOURCE_DIR})
 
 add_custom_target(
 	program-mcs
@@ -89,3 +93,22 @@ add_custom_target(
 	COMMAND ${CMAKE_BINARY_DIR}/${PROJECT_NAME}_tb_isim.exe -intstyle ise -gui -tclbatch isim.cmd
 	COMMAND ${CMAKE_COMMAND} -E copy out.txt ${CMAKE_SOURCE_DIR}/out.txt
 )
+
+set(ADD_CLEAN_FILES
+	${PROJECT_NAME}.ngd ${PROJECT_NAME}.ut ${PROJECT_NAME}_ngdbuild.xrpt
+	${PROJECT_NAME}.ngr ${PROJECT_NAME}.pad ${PROJECT_NAME}.xpi
+	${PROJECT_NAME}_pad.csv ${PROJECT_NAME}.xst ${PROJECT_NAME}.bgn
+	${PROJECT_NAME}_pad.txt ${PROJECT_NAME}_xst.xrpt ${PROJECT_NAME}_bitgen.xwbt
+	${PROJECT_NAME}.par ${PROJECT_NAME}.bld ${PROJECT_NAME}_par.xrpt
+	${PROJECT_NAME}.cfi ${PROJECT_NAME}.pcf ${PROJECT_NAME}.cmd_log
+	${PROJECT_NAME}.prj ${PROJECT_NAME}.drc ${PROJECT_NAME}.prm
+	${PROJECT_NAME}.ptwx ${PROJECT_NAME}_guide.ncd ${PROJECT_NAME}.stx
+	${PROJECT_NAME}.lso ${PROJECT_NAME}_summary.xml ${PROJECT_NAME}_map.map
+	${PROJECT_NAME}.syr ${PROJECT_NAME}_map.mrp ${PROJECT_NAME}_map.ncd
+	${PROJECT_NAME}_map.ngm ${PROJECT_NAME}.twr ${PROJECT_NAME}_map.xrpt
+	${PROJECT_NAME}.twx ${PROJECT_NAME}.mcs ${PROJECT_NAME}.ncd 
+	${PROJECT_NAME}.unroutes ${PROJECT_NAME}.ngc ${PROJECT_NAME}_usage.xml
+	_impactbatch.log _ngo par_usage_statistics.html usage_statistics_webtalk.html webtalk.log webtalk_pn.xml xlnx_auto_0_xdb xst)
+
+# Add clean files
+set_directory_properties(PROPERTIES ADDITIONAL_MAKE_CLEAN_FILES "${ADD_CLEAN_FILES}")
